@@ -1,4 +1,4 @@
-package com.martext.martext.utils;
+package com.p_runtext.p_runtext.utils;
 
 import android.content.Context;
 

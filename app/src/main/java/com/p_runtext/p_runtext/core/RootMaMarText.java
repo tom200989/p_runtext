@@ -1,4 +1,4 @@
-package com.martext.martext.core;
+package com.p_runtext.p_runtext.core;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -18,9 +18,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import com.martext.martext.R;
-import com.martext.martext.utils.DipPx;
-import com.martext.martext.utils.ScreenSize;
+import com.p_runtext.p_runtext.R;
+import com.p_runtext.p_runtext.utils.DipPx;
+import com.p_runtext.p_runtext.utils.ScreenSize;
 
 import java.util.Locale;
 
