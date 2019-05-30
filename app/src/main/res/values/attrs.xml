@@ -47,6 +47,13 @@
 
         <!-- 10.是否反转 -->
         <attr name="marIsReverse" format="boolean" />
+        
+        <!-- 11.对齐 -->
+        <attr name="marGravity" format="integer" >
+            <enum name="Start" value="0"/>
+            <enum name="Center" value="1"/>
+            <enum name="End" value="2"/>
+        </attr>
 
     </declare-styleable>
 </resources>

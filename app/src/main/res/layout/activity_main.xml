@@ -26,11 +26,12 @@
             app:marDirection="Left"
             app:marIsRepeat="true"
             app:marIsReverse="false"
+            app:marGravity="End"
             app:marReverseLanguage="zh;en;ar"
             app:marSpeedLevel="so_slow"
             app:marStartSide="Left"
-            app:marText="good good"
-            app:marTextSizeRate="0.1"
+            app:marText="hello"
+            app:marTextSizeRate="0.03"
             app:marTextcolor="#009688" />
 
     </RelativeLayout>

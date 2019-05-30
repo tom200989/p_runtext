@@ -16,6 +16,7 @@
     marSpeedLevel:          速度等级, [so_slow][slow][standard][fast][so_fast]
     marReverseLanguage:     需要适配的语言简写(如阿拉伯语需要从右到左), 如: ar;zh;en...多个语言中间使用［;］分割 
     marIsReverse:           是否反转, 如用户手动配置了反转, 则优先于语言反转
+    marGravity:             静止时的对齐方式, [Start]:左侧对齐; [Center]:居中对齐; [End]:右侧对齐;
     
     <方法>
     setText(String text): 动态设置文本
@@ -43,6 +44,7 @@
             app:marSpeedLevel="so_slow"
             app:marStartSide="Left"
             app:marText="good good"
+            app:marGravity="End"
             app:marTextSizeRate="0.1"
             app:marTextcolor="#009688" />
 
