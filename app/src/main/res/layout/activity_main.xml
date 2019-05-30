@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.MainActivity">
+    android:layout_height="match_parent">
 
     <EditText
         android:layout_width="match_parent"
@@ -17,16 +16,16 @@
         android:layout_centerInParent="true"
         android:background="#FFFF00">
 
-        <com.p_runtext.p_runtext.core.RootMaMarText
+        <com.martext.martext.core.RootMaMarText
             android:id="@+id/tv_marquee"
-            android:layout_width="175dp"
+            android:layout_width="30dp"
             android:layout_height="70dp"
             android:layout_centerInParent="true"
             app:marBackground="@color/colorAccent"
             app:marDirection="Left"
             app:marIsRepeat="true"
             app:marIsReverse="false"
-            app:marGravity="End"
+            app:marGravity="Center"
             app:marReverseLanguage="zh;en;ar"
             app:marSpeedLevel="so_slow"
             app:marStartSide="Left"

@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 
 import com.p_runtext.p_runtext.R;
-import com.p_runtext.p_runtext.core.RootMaMarText;
+import com.martext.martext.core.RootMaMarText;
 
 public class MainActivity extends AppCompatActivity {
 
