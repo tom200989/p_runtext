@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainActivity">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_centerInParent="true"
+        android:background="#FFFF00">
+
+        <com.p_runtext.p_runtext.core.RootMaMarText
+            android:id="@+id/tv_marquee"
+            android:layout_width="175dp"
+            android:layout_height="70dp"
+            android:layout_centerInParent="true"
+            app:marBackground="@color/colorAccent"
+            app:marDirection="Left"
+            app:marIsRepeat="true"
+            app:marIsReverse="false"
+            app:marReverseLanguage="zh;en;ar"
+            app:marSpeedLevel="so_slow"
+            app:marStartSide="Left"
+            app:marText="good good"
+            app:marTextSizeRate="0.1"
+            app:marTextcolor="#009688" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RootMaMarText">
+
+        <!-- 1.文本颜色 -->
+        <attr name="marTextcolor" format="color" />
+
+        <!-- 2.文本大小比例(相对屏幕) -->
+        <attr name="marTextSizeRate" format="float" />
+
+        <!-- 3.文本背景色 -->
+        <attr name="marBackground" format="color" />
+
+        <!-- 4.是否循环 -->
+        <attr name="marIsRepeat" format="boolean" />
+
+        <!-- 5.从那一侧开始滚动 -->
+        <attr name="marStartSide" format="integer">
+            <!-- 从左侧 -->
+            <enum name="Left" value="0" />
+            <!-- 从右侧 -->
+            <enum name="Right" value="1" />
+        </attr>
+
+        <!-- 6.滚动方向 -->
+        <attr name="marDirection" format="integer">
+            <!-- 向左 -->
+            <enum name="Left" value="0" />
+            <!-- 向右 -->
+            <enum name="Right" value="1" />
+        </attr>
+
+        <!-- 7.文本内容 -->
+        <attr name="marText" format="string" />
+
+        <!-- 8.速度等级 -->
+        <attr name="marSpeedLevel" format="integer">
+            <enum name="so_slow" value="480" />
+            <enum name="slow" value="360" />
+            <enum name="standard" value="240" />
+            <enum name="fast" value="120" />
+            <enum name="so_fast" value="60" />
+        </attr>
+
+        <!-- 9.需要适配的语言(如阿拉伯语需要从右到左) -->
+        <attr name="marReverseLanguage" format="string" />
+
+        <!-- 10.是否反转 -->
+        <attr name="marIsReverse" format="boolean" />
+
+    </declare-styleable>
+</resources>
