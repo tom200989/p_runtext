@@ -18,21 +18,19 @@
 
         <com.p_runtext.p_runtext.core.RootMaMarText
             android:id="@+id/tv_marquee"
-            android:layout_width="130dp"
+            android:layout_width="89dp"
             android:layout_height="70dp"
             android:layout_centerInParent="true"
             app:marBackground="@color/colorAccent"
             app:marDirection="Left"
             app:marIsRepeat="true"
-            app:marIsReverse="false"
             app:marGravity="Center"
-            app:marReverseLanguage="zh;en;ar"
-            app:marSpeedLevel="so_slow"
+            app:marSpeedLevel="so_fast"
+            app:marReverseLanguage="sr;de;ar"
+            app:marIsReverse="false"
             app:marStartSide="Left"
-            app:marText="hello"
             app:marTextSizeRate="0.03"
             app:marTextcolor="#009688" />
-
     </RelativeLayout>
 
 </RelativeLayout>

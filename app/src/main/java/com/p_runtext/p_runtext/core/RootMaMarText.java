@@ -74,6 +74,7 @@ public class RootMaMarText extends SurfaceView implements SurfaceHolder.Callback
         startSide = a.getInt(R.styleable.RootMaMarText_marStartSide, 0);// 默认左侧开始
         direction = a.getInt(R.styleable.RootMaMarText_marDirection, 0);// 默认向左滚动
         text = a.getString(R.styleable.RootMaMarText_marText);
+        text = TextUtils.isEmpty(text) ? " " : text;// 此处必须使用一个［ ］空格, 否则surfaceview将在空串的情况下无法设置背景
         speed = a.getInt(R.styleable.RootMaMarText_marSpeedLevel, 240);
         reverseLanguages = a.getString(R.styleable.RootMaMarText_marReverseLanguage);
         isReverse = a.getBoolean(R.styleable.RootMaMarText_marIsReverse, false);
@@ -132,6 +133,7 @@ public class RootMaMarText extends SurfaceView implements SurfaceHolder.Callback
      * @param text 文本
      */
     protected void setTextPaint(String text) {
+        this.text = text;
         textPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         textPaint.setTextAlign(Paint.Align.LEFT);
         textPaint.setTextSize(calTextsize());
@@ -210,59 +212,59 @@ public class RootMaMarText extends SurfaceView implements SurfaceHolder.Callback
             synchronized (SurfaceHolder.class) {
                 if (TextUtils.isEmpty(text)) {
                     Thread.sleep(1000);// 睡眠时间为1秒
-                    return;
-                }
-                Canvas canvas = holder.lockCanvas();
-                int paddingLeft = getPaddingLeft();
-                int paddingTop = getPaddingTop();
-                int paddingRight = getPaddingRight();
-                int paddingBottom = getPaddingBottom();
+                } else {
+                    Canvas canvas = holder.lockCanvas();
+                    int paddingLeft = getPaddingLeft();
+                    int paddingTop = getPaddingTop();
+                    int paddingRight = getPaddingRight();
+                    int paddingBottom = getPaddingBottom();
 
-                int contentWidth = getWidth() - paddingLeft - paddingRight;
-                int contentHeight = getHeight() - paddingTop - paddingBottom;
+                    int contentWidth = getWidth() - paddingLeft - paddingRight;
+                    int contentHeight = getHeight() - paddingTop - paddingBottom;
 
-                int centeYLine = paddingTop + contentHeight / 2;// 中心线
+                    int centeYLine = paddingTop + contentHeight / 2;// 中心线
 
-                /* 核心代码 */
-                // 字长 > 控件长 --> 则需要滚动
-                isNeedScroll = textWidth > widgetWidth;
-                currentX = isNeedScroll ? currentX : setCurrentXByGravity();// 不需要滚动时让字体根据对齐方式设置
-                // 如果检测到需要滚动才开始滚动
-                if (isNeedScroll) {
-                    if (direction == 0) {// 向左滚动
-                        if (currentX <= -textWidth) {
-                            if (!isRepeat) {// 如果是不重复滚动
-                                mHandler.sendEmptyMessage(ROLL_OVER);
+                    /* 核心代码 */
+                    // 字长 > 控件长 --> 则需要滚动
+                    isNeedScroll = textWidth > widgetWidth;
+                    currentX = isNeedScroll ? currentX : setCurrentXByGravity();// 不需要滚动时让字体根据对齐方式设置
+                    // 如果检测到需要滚动才开始滚动
+                    if (isNeedScroll) {
+                        if (direction == 0) {// 向左滚动
+                            if (currentX <= -textWidth) {
+                                if (!isRepeat) {// 如果是不重复滚动
+                                    mHandler.sendEmptyMessage(ROLL_OVER);
+                                }
+                                currentX = contentWidth;
+                            } else {
+                                currentX -= sepX;
                             }
-                            currentX = contentWidth;
-                        } else {
-                            currentX -= sepX;
-                        }
-                    } else {//  向右滚动
-                        if (currentX >= contentWidth) {
-                            if (!isRepeat) {//如果是不重复滚动
-                                mHandler.sendEmptyMessage(ROLL_OVER);
+                        } else {//  向右滚动
+                            if (currentX >= contentWidth) {
+                                if (!isRepeat) {//如果是不重复滚动
+                                    mHandler.sendEmptyMessage(ROLL_OVER);
+                                }
+                                currentX = -textWidth;
+                            } else {
+                                currentX += sepX;
                             }
-                            currentX = -textWidth;
-                        } else {
-                            currentX += sepX;
                         }
                     }
+
+                    if (canvas != null) {
+                        canvas.drawColor(backGroundColor);
+                        int halfTextHeight = DipPx.dip2px(getContext(), textHeight) / 2;
+                        canvas.drawText(text, currentX, centeYLine + halfTextHeight, textPaint);
+                    }
+
+                    holder.unlockCanvasAndPost(canvas);// 结束锁定画图，并提交改变。
+
+                    int a = textWidth / text.trim().length();
+                    int b = a / sepX;
+                    int c = speed / b == 0 ? 1 : speed / b;
+
+                    Thread.sleep(c);// 睡眠时间为移动的频率
                 }
-
-                if (canvas != null) {
-                    canvas.drawColor(backGroundColor);
-                    int halfTextHeight = DipPx.dip2px(getContext(), textHeight) / 2;
-                    canvas.drawText(text, currentX, centeYLine + halfTextHeight, textPaint);
-                }
-
-                holder.unlockCanvasAndPost(canvas);// 结束锁定画图，并提交改变。
-
-                int a = textWidth / text.trim().length();
-                int b = a / sepX;
-                int c = speed / b == 0 ? 1 : speed / b;
-
-                Thread.sleep(c);// 睡眠时间为移动的频率
             }
         } catch (Exception e) {
             e.printStackTrace();
