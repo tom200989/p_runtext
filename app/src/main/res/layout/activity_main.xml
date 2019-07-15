@@ -29,6 +29,7 @@
         app:marBackground="@android:color/black"
         app:marDirection="R_TO_L"
         app:marGravity="Center"
+        app:marReverseLanguage="ar;en"
         app:marSpeedLevel="standard"
         app:marText="ABCDEFGHIJKLMNOPQRST"
         app:marTextSizeRate="0.03"

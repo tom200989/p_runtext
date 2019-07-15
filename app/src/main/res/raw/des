@@ -9,20 +9,14 @@
     marTextcolor:           文本颜色, 如R.color.xxx, "#009688"
     marTextSizeRate:        文本大小比例(相对屏幕), 如: 0.03
     marBackground:          文本颜色, 如R.color.xxx, "#009688"
-    marIsRepeat:            是否循环
-    marStartSide:           从那一侧开始滚动, [Left]:左侧; [Right]:右侧
-    marDirection:           滚动方向, [Left]:左侧; [Right]:右侧
+    marDirection:           滚动方向, [L_TO_R]:从左向右; [R_TO_L]:从右向左
     marText:                文本内容, 如:"hello"
     marSpeedLevel:          速度等级, [so_slow][slow][standard][fast][so_fast]
     marReverseLanguage:     需要适配的语言简写(如阿拉伯语需要从右到左), 如: ar;zh;en...多个语言中间使用［;］分割 
-    marIsReverse:           是否反转, 如用户手动配置了反转, 则优先于语言反转
     marGravity:             静止时的对齐方式, [Start]:左侧对齐; [Center]:居中对齐; [End]:右侧对齐;
     
     <方法>
-    setText(String text): 动态设置文本
-    reset(): 重新开始
-    start(): 开始滚动
-    stop(): 停止滚动
+    setMarText(String text): 动态设置文本
 
 [PART3: 扩展]
     1.本控件支持百分比布局, 请直接使用[layout_widthPercent]以及[layout_heightPercent]即可
@@ -32,21 +26,19 @@
 [PART4: 案例]
     <XML>
         <com.p_runtext.p_runtext.core.RootMaMarText
-            android:id="@+id/tv_marquee"
+            android:id="@+id/tvmar1"
             android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            app:marBackground="@color/colorAccent"
-            app:marDirection="Left"
-            app:marIsRepeat="true"
-            app:marIsReverse="false"
-            app:marReverseLanguage="zh;en;ar"
-            app:marSpeedLevel="so_slow"
-            app:marStartSide="Left"
-            app:marText="good good"
-            app:marGravity="End"
-            app:marTextSizeRate="0.1"
-            app:marTextcolor="#009688" />
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            app:marBackground="@android:color/black"
+            app:marDirection="R_TO_L"
+            app:marGravity="Center"
+            app:marReverseLanguage="ar;en"
+            app:marSpeedLevel="standard"
+            app:marText="ABCDEFGHIJKLMNOPQRST"
+            app:marTextSizeRate="0.03"
+            app:marTextcolor="@android:color/white" />
 
     <JAVA>
         RootMaMarText rootMaMarText = findViewById(R.id.tv_marquee);
+        rootMaMarText.setMarText("ABCDEFGHIJKLMNOPQRSTUVWXYZ");

@@ -261,7 +261,7 @@ public class RootMaMarText extends TextView {
     /**
      * 开始
      */
-    public void start() {
+    private void start() {
         isStart = true;
         stopTimer();
         timerHelper = new TimerHelper((Activity) context) {
@@ -324,5 +324,12 @@ public class RootMaMarText extends TextView {
         isStart = false;
         // 刷新
         invalidate();
+    }
+
+    /**
+     * 停止
+     */
+    private void stop() {
+        stopTimer();
     }
 }
