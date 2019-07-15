@@ -1,57 +1,64 @@
 package com.p_runtext.p_runtext.core;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
-import android.os.Handler;
 import android.os.LocaleList;
-import android.os.Message;
-import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.WindowManager;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.widget.TextView;
 
 import com.p_runtext.p_runtext.R;
-import com.p_runtext.p_runtext.utils.DipPx;
 import com.p_runtext.p_runtext.utils.ScreenSize;
+import com.p_runtext.p_runtext.utils.TimerHelper;
 
 import java.util.Locale;
 
-/* url1: https://blog.csdn.net/weixin_37730482/article/details/80675427 */
-/* url2: https://www.jb51.net/article/90968.htm */
-public class RootMaMarText extends SurfaceView implements SurfaceHolder.Callback {
+/*
+ * Created by qianli.ma on 2019/7/12 0012.
+ */
+@SuppressLint("AppCompatCustomView")
+public class RootMaMarText extends TextView {
 
-    private float textSizeRate = 0.03f; // 字体大小比例(相对屏幕)
+    private final int R_TO_L = 0;// 从右到左
+    private final int L_TO_R = 1;// 从左到右
+    private final int SO_SLOW = 20;// 非常慢
+    private final int SLOW = 16;// 慢
+    private final int NORMAL = 12;// 正常
+    private final int FAST = 8;// 快
+    private final int SO_FAST = 4;// 非常快
+    private final int GRAVIRY_START = 0;// 靠左(阿拉伯语靠右)
+    private final int GRAVIRY_CENTER = 1;// 居中
+    private final int GRAVIRY_END = 2;// 靠右(阿拉伯语靠左)
+
+    private float textSizeRate = 0.02f; // 字体大小比例(相对屏幕)
     private int textColor = Color.RED; // 字体的颜色
     private int backGroundColor = Color.WHITE;// 背景色
-    private boolean isRepeat;// 是否重复滚动
-    private int startSide;// 开始滚动的位置(0是从最左面开始 1是从最末尾开始)
-    private int direction;// 滚动方向 0 向左滚动   1向右滚动
+    private int direction;// 滚动方向 0 从右向左  1 从左向右
     private int speed;// 速度等级
     private String text;// 文本
     private int gravity;// 对齐方式
+    private String reverseLanguages;// 需要反转的语言
 
-    public Context context;
-    private SurfaceHolder holder;
-    private TextPaint textPaint;
-    private MaThread thread;
-    private int textWidth = 0, textHeight = 0;
-    public int currentX = 0;// 当前x的位置
-    public int sepX = 2;// 每一步滚动的距离
+    private Paint paint;
+    private int baseline;
+    private TimerHelper timerHelper;
+    private Context context;
+    private int x;// 初始位置
+    private int stringWidth;// 字符宽度
     private int widgetWidth;// 控件宽度
-    private boolean isNeedScroll = true;// 是否需要滚动
-    private String reverseLanguages;
-    private boolean isReverse;
+    private boolean isStart;// 是否已经开启了timer
+    private String dyText;// 动态设置时临时存储的变量
 
     public RootMaMarText(Context context) {
-        this(context, null);
+        this(context, null, 0);
     }
 
     public RootMaMarText(Context context, AttributeSet attrs) {
@@ -61,34 +68,29 @@ public class RootMaMarText extends SurfaceView implements SurfaceHolder.Callback
     public RootMaMarText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
-        init(attrs, defStyleAttr);// 初始化属性
+        initAttrs(attrs, defStyleAttr);
     }
 
-    private void init(AttributeSet attrs, int defStyleAttr) {
+    /**
+     * 初始化属性
+     *
+     * @param attrs        属性
+     * @param defStyleAttr 属性
+     */
+    private void initAttrs(AttributeSet attrs, int defStyleAttr) {
         // 属性提取
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.RootMaMarText, defStyleAttr, 0);
-        textColor = a.getColor(R.styleable.RootMaMarText_marTextcolor, Color.BLACK);
-        textSizeRate = a.getFloat(R.styleable.RootMaMarText_marTextSizeRate, 0.03f);
-        backGroundColor = a.getColor(R.styleable.RootMaMarText_marBackground, Color.RED);
-        isRepeat = a.getBoolean(R.styleable.RootMaMarText_marIsRepeat, true);
-        startSide = a.getInt(R.styleable.RootMaMarText_marStartSide, 0);// 默认左侧开始
-        direction = a.getInt(R.styleable.RootMaMarText_marDirection, 0);// 默认向左滚动
+        textColor = a.getColor(R.styleable.RootMaMarText_marTextcolor, Color.YELLOW);
+        textSizeRate = a.getFloat(R.styleable.RootMaMarText_marTextSizeRate, textSizeRate);
+        backGroundColor = a.getColor(R.styleable.RootMaMarText_marBackground, Color.BLACK);
+        direction = a.getInt(R.styleable.RootMaMarText_marDirection, R_TO_L);// 默认从［右-左］滚动
         text = a.getString(R.styleable.RootMaMarText_marText);
-        text = TextUtils.isEmpty(text) ? " " : text;// 此处必须使用一个［ ］空格, 否则surfaceview将在空串的情况下无法设置背景
-        speed = a.getInt(R.styleable.RootMaMarText_marSpeedLevel, 240);
+        speed = a.getInt(R.styleable.RootMaMarText_marSpeedLevel, SO_SLOW);
         reverseLanguages = a.getString(R.styleable.RootMaMarText_marReverseLanguage);
-        isReverse = a.getBoolean(R.styleable.RootMaMarText_marIsReverse, false);
-        gravity = a.getInt(R.styleable.RootMaMarText_marGravity, 1);
+        gravity = a.getInt(R.styleable.RootMaMarText_marGravity, GRAVIRY_CENTER);
         // 重新根据语言来决定是否反转
-        startSide = direction = resetReverseLanguage() ? 1 : 0;
+        direction = resetReverseLanguage() ? L_TO_R : R_TO_L;
         a.recycle();
-        // 设置holder
-        holder = this.getHolder();
-        holder.addCallback(this);
-        textPaint = new TextPaint();
-        setTextPaint(text);
-        setFocusable(true);
-        requestFocus();
     }
 
     /**
@@ -98,7 +100,7 @@ public class RootMaMarText extends SurfaceView implements SurfaceHolder.Callback
      */
     private boolean resetReverseLanguage() {
         // 如果用户主动设置反转 --> 则反转
-        if (isReverse) {
+        if (direction == L_TO_R) {
             return true;
         }
 
@@ -110,7 +112,6 @@ public class RootMaMarText extends SurfaceView implements SurfaceHolder.Callback
         }
         // 获取到系统当前语言fr,de,zh...
         String currentLanguage = locale.getLanguage();
-        Log.i("ma_lang", "lang: " + currentLanguage);
         // 遍历
         if (!TextUtils.isEmpty(reverseLanguages)) {
             if (reverseLanguages.contains(";")) {
@@ -128,27 +129,6 @@ public class RootMaMarText extends SurfaceView implements SurfaceHolder.Callback
     }
 
     /**
-     * 设置文本属性
-     *
-     * @param text 文本
-     */
-    protected void setTextPaint(String text) {
-        this.text = text;
-        textPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setTextAlign(Paint.Align.LEFT);
-        textPaint.setTextSize(calTextsize());
-        textPaint.setColor(textColor);
-        textPaint.setStrokeWidth(0.5f);
-        textPaint.setFakeBoldText(true);
-        textWidth = (int) textPaint.measureText(text);
-        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
-        textHeight = (int) fontMetrics.bottom;
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        int width = wm.getDefaultDisplay().getWidth();
-        currentX = startSide == 0 ? 0 : width - getPaddingLeft() - getPaddingRight();
-    }
-
-    /**
      * 计算文本大小
      *
      * @return 文本大小
@@ -160,202 +140,189 @@ public class RootMaMarText extends SurfaceView implements SurfaceHolder.Callback
         return Math.abs(textSize);
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        this.holder = holder;
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        widgetWidth = getWidth();
-        start();// 获取到控件宽度后才启动绘制线程
-        thread.isRun = true;
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        thread.isRun = false;
-        thread = null;
+    /**
+     * 初始化画笔
+     */
+    private void initPaint() {
+        paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setDither(true);
+        paint.setTextSize(calTextsize());
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setColor(textColor);
+        paint.setStyle(Paint.Style.FILL);
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, calTextsize());
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        // 此处是为了防止setMartext执行速度比onSizeChange的情况下 -- 需要以动态设置的优先
+        if (!TextUtils.isEmpty(dyText)) {
+            text = dyText;// 以动态设置的优先
+        }
+        init();// 开始初始化
     }
 
-    /* -------------------------------------------- class -------------------------------------------- */
-
     /**
-     * 滚动线程
+     * 根据语言系统进行设置X的初始值
+     *
+     * @return x 起始坐标
      */
-    private class MaThread extends Thread {
-
-        private boolean isRun;//是否在运行
-
-        private MaThread() {
-            isRun = true;
-        }
-
-        @Override
-        public void run() {
-            while (isRun) {
-                startDraw();
+    private int initX() {
+        /* 字符长度 <= 控件长度 -- 静态显示的情况 */
+        if (stringWidth <= widgetWidth) {
+            if (gravity == 1) {// CENTER
+                paint.setTextAlign(Paint.Align.CENTER);
+                return getWidth() / 2;
             }
-        }
-    }
 
-    /**
-     * 开始绘制
-     */
-    private void startDraw() {
-        try {
-            synchronized (SurfaceHolder.class) {
-                if (TextUtils.isEmpty(text)) {
-                    Thread.sleep(1000);// 睡眠时间为1秒
+            if (gravity == 0) {// START
+                if (direction == R_TO_L) {
+                    paint.setTextAlign(Paint.Align.LEFT);
+                    return 0;
                 } else {
-                    Canvas canvas = holder.lockCanvas();
-                    int paddingLeft = getPaddingLeft();
-                    int paddingTop = getPaddingTop();
-                    int paddingRight = getPaddingRight();
-                    int paddingBottom = getPaddingBottom();
-
-                    int contentWidth = getWidth() - paddingLeft - paddingRight;
-                    int contentHeight = getHeight() - paddingTop - paddingBottom;
-
-                    int centeYLine = paddingTop + contentHeight / 2;// 中心线
-
-                    /* 核心代码 */
-                    // 字长 > 控件长 --> 则需要滚动
-                    isNeedScroll = textWidth > widgetWidth;
-                    currentX = isNeedScroll ? currentX : setCurrentXByGravity();// 不需要滚动时让字体根据对齐方式设置
-                    // 如果检测到需要滚动才开始滚动
-                    if (isNeedScroll) {
-                        if (direction == 0) {// 向左滚动
-                            if (currentX <= -textWidth) {
-                                if (!isRepeat) {// 如果是不重复滚动
-                                    mHandler.sendEmptyMessage(ROLL_OVER);
-                                }
-                                currentX = contentWidth;
-                            } else {
-                                currentX -= sepX;
-                            }
-                        } else {//  向右滚动
-                            if (currentX >= contentWidth) {
-                                if (!isRepeat) {//如果是不重复滚动
-                                    mHandler.sendEmptyMessage(ROLL_OVER);
-                                }
-                                currentX = -textWidth;
-                            } else {
-                                currentX += sepX;
-                            }
-                        }
-                    }
-
-                    if (canvas != null) {
-                        canvas.drawColor(backGroundColor);
-                        int halfTextHeight = DipPx.dip2px(getContext(), textHeight) / 2;
-                        canvas.drawText(text, currentX, centeYLine + halfTextHeight, textPaint);
-                    }
-
-                    holder.unlockCanvasAndPost(canvas);// 结束锁定画图，并提交改变。
-
-                    int a = textWidth / text.trim().length();
-                    int b = a / sepX;
-                    int c = speed / b == 0 ? 1 : speed / b;
-
-                    Thread.sleep(c);// 睡眠时间为移动的频率
+                    paint.setTextAlign(Paint.Align.RIGHT);
+                    return widgetWidth;
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            if (gravity == 2) {// END
+                if (direction == R_TO_L) {
+                    paint.setTextAlign(Paint.Align.RIGHT);
+                    return widgetWidth;
+                } else {
+                    paint.setTextAlign(Paint.Align.LEFT);
+                    return 0;
+                }
+            }
+
+            paint.setTextAlign(Paint.Align.CENTER);
+            return widgetWidth / 2;
+
+        } else {/* 字符长度 > 控件长度 -- 动态显示 */
+            if (direction == R_TO_L) {
+                paint.setTextAlign(Paint.Align.LEFT);
+                return widgetWidth;
+            } else {
+                paint.setTextAlign(Paint.Align.RIGHT);
+                return 0;
+            }
         }
     }
 
     /**
-     * 根据对齐方式来决定位置
-     *
-     * @return 需要偏移的left
+     * 获取字符以及控件的宽度
      */
-    private int setCurrentXByGravity() {
-        if (gravity == 0) {// 左侧对齐
-            return 0;
+    private void getAllWidth() {
+        stringWidth = (int) paint.measureText(text);
+        widgetWidth = getWidth();
+    }
 
-        } else if (gravity == 1) {// 居中
-            return widgetWidth / 2 - textWidth / 2;
+    /**
+     * 开始初始化
+     */
+    private void init() {
+        // 初始化画笔
+        initPaint();
+        // 计算字符实际宽度
+        getAllWidth();
+        // 计算初始化x的位置
+        x = initX();
+    }
 
-        } else if (gravity == 2) {// 右侧
-            if (textWidth > widgetWidth) {
-                return -(textWidth - widgetWidth);
-            } else if (textWidth == widgetWidth) {
-                return 0;
+    @Override
+    protected void onDraw(Canvas canvas) {
+        // 第一次绘制时启动线程
+        if (!isStart) {
+            if (stringWidth > widgetWidth) {
+                start();
             } else {
-                return widgetWidth - textWidth;
+                if (timerHelper != null) {
+                    timerHelper.stop();
+                }
             }
-        } else {
-            return 0;
+        }
+
+        // 绘制原文本不变
+        setLines(1);
+        setMaxLines(1);
+        setText(text);
+        setGravity(Gravity.CENTER);
+        setTextColor(backGroundColor);
+        setBackgroundColor(backGroundColor);
+        super.onDraw(canvas);
+        // 绘制自己的文本
+        baseline = getBaseline();
+        paint.setTextSize(calTextsize());
+        canvas.drawText(text, x, baseline, paint);
+    }
+
+    /**
+     * 开始
+     */
+    public void start() {
+        isStart = true;
+        stopTimer();
+        timerHelper = new TimerHelper((Activity) context) {
+            @Override
+            public void doSomething() {
+                calNewX();// 计算新的X坐标
+                invalidate();// 刷新
+            }
+        };
+        timerHelper.start(speed);
+
+    }
+
+    /**
+     * 计算新的X坐标
+     */
+    private void calNewX() {
+        if (direction == R_TO_L) {// 从右到左
+            if (x > -stringWidth) {
+                x--;
+            } else {
+                x = widgetWidth;
+            }
+
+        } else {// 从左到右
+            if (x < widgetWidth + stringWidth) {
+                x++;
+            } else {
+                x = 0;
+            }
         }
     }
 
-    public static final int ROLL_OVER = 100;// 滚动message标记
-
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-
-            switch (msg.what) {
-                case ROLL_OVER:// 滚动结束
-                    stop();
-                    break;
-            }
+    /**
+     * 注销定时器
+     */
+    private void stopTimer() {
+        if (timerHelper != null) {
+            timerHelper.stop();
+            timerHelper = null;
         }
-    };
+    }
 
     /* -------------------------------------------- public -------------------------------------------- */
 
     /**
-     * 动态开始滚动
-     */
-    public void start() {
-        if (thread != null && thread.isRun) {
-            return;
-        }
-        thread = new MaThread();// 创建一个绘图线程
-        thread.start();
-    }
-
-    /**
-     * 动态设置文本
+     * 动态设置text
      *
-     * @param text 文本
+     * @param marText 需要重新设置的文本
      */
-    public void setText(String text) {
-        if (!TextUtils.isEmpty(text)) {
-            setTextPaint(text);
-        }
+    public void setMartext(String marText) {
+        dyText = marText;// 假设本方法比onSizeChange执行速度快的情况 -- 此处需要在onSizeChange重新判断以本方法的text为准
+        text = marText;// 假设本方法比onSizeChange执行速度慢的情况那么需要使用martext去覆盖本地的text
+        init();// 重新初始化
+        /*
+         * 此处是为了防止: 当XML设置了超长字符, 但动态设置了超短字符(说明无需滚动)
+         * 此时定制器会自动启动, 但由于是动态设置优先, 此时应该停止定时器, 但定时器在启动一次后isStart = true
+         * 在此轮询时, onDraw()无法进入到［if］内部去stop定时器, 因此要手动切换为false以进入［if］条件体
+         * */
+        isStart = false;
+        // 刷新
+        invalidate();
     }
-
-    /**
-     * 动态重置滚动
-     */
-    public void reset() {
-        int contentWidth = getWidth() - getPaddingLeft() - getPaddingRight();
-        if (startSide == 0)
-            currentX = 0;
-        else
-            currentX = contentWidth;
-    }
-
-    /**
-     * 动态停止滚动
-     */
-    public void stop() {
-        if (thread != null) {
-            thread.isRun = false;
-            thread.interrupt();
-        }
-        thread = null;
-    }
-
 }

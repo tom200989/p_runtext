@@ -6,31 +6,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
+    <Button
+        android:id="@+id/bt_"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:onClick="clickme"
+        android:text="click me to main 2" />
 
-    <RelativeLayout
+    <com.p_runtext.p_runtext.core.RootMaMarText
+        android:id="@+id/tvmar"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="60dp"
         android:layout_centerInParent="true"
-        android:background="#FFFF00">
+        app:marGravity="Center"
+        app:marText="ABCD" />
 
-        <com.p_runtext.p_runtext.core.RootMaMarText
-            android:id="@+id/tv_marquee"
-            android:layout_width="89dp"
-            android:layout_height="70dp"
-            android:layout_centerInParent="true"
-            app:marBackground="@color/colorAccent"
-            app:marDirection="Left"
-            app:marIsRepeat="true"
-            app:marGravity="Center"
-            app:marSpeedLevel="so_fast"
-            app:marReverseLanguage="sr;de;ar"
-            app:marIsReverse="false"
-            app:marStartSide="Left"
-            app:marTextSizeRate="0.03"
-            app:marTextcolor="#009688" />
-    </RelativeLayout>
+    <com.p_runtext.p_runtext.core.RootMaMarText
+        android:id="@+id/tvmar1"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        app:marBackground="@android:color/black"
+        app:marDirection="R_TO_L"
+        app:marGravity="Center"
+        app:marSpeedLevel="standard"
+        app:marText="ABCDEFGHIJKLMNOPQRST"
+        app:marTextSizeRate="0.03"
+        app:marTextcolor="@android:color/white" />
 
 </RelativeLayout>

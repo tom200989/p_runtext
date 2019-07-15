@@ -11,44 +11,30 @@
         <!-- 3.文本背景色 -->
         <attr name="marBackground" format="color" />
 
-        <!-- 4.是否循环 -->
-        <attr name="marIsRepeat" format="boolean" />
-
-        <!-- 5.从那一侧开始滚动 -->
-        <attr name="marStartSide" format="integer">
-            <!-- 从左侧 -->
-            <enum name="Left" value="0" />
-            <!-- 从右侧 -->
-            <enum name="Right" value="1" />
-        </attr>
-
-        <!-- 6.滚动方向 -->
+        <!-- 4.滚动方向 -->
         <attr name="marDirection" format="integer">
             <!-- 向左 -->
-            <enum name="Left" value="0" />
+            <enum name="R_TO_L" value="0" />
             <!-- 向右 -->
-            <enum name="Right" value="1" />
+            <enum name="L_TO_R" value="1" />
         </attr>
 
-        <!-- 7.文本内容 -->
+        <!-- 5.文本内容 -->
         <attr name="marText" format="string" />
 
-        <!-- 8.速度等级 -->
+        <!-- 6.速度等级 -->
         <attr name="marSpeedLevel" format="integer">
-            <enum name="so_slow" value="480" />
-            <enum name="slow" value="360" />
-            <enum name="standard" value="240" />
-            <enum name="fast" value="120" />
-            <enum name="so_fast" value="60" />
+            <enum name="so_slow" value="20" />
+            <enum name="slow" value="16" />
+            <enum name="standard" value="12" />
+            <enum name="fast" value="8" />
+            <enum name="so_fast" value="4" />
         </attr>
 
-        <!-- 9.需要适配的语言(如阿拉伯语需要从右到左) -->
+        <!-- 7.需要适配的语言(如阿拉伯语需要从右到左) -->
         <attr name="marReverseLanguage" format="string" />
-
-        <!-- 10.是否反转 -->
-        <attr name="marIsReverse" format="boolean" />
         
-        <!-- 11.对齐 -->
+        <!-- 8.对齐 -->
         <attr name="marGravity" format="integer" >
             <enum name="Start" value="0"/>
             <enum name="Center" value="1"/>
@@ -56,4 +42,5 @@
         </attr>
 
     </declare-styleable>
+
 </resources>
