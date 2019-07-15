@@ -85,6 +85,7 @@ public class RootMaMarText extends TextView {
         backGroundColor = a.getColor(R.styleable.RootMaMarText_marBackground, Color.BLACK);
         direction = a.getInt(R.styleable.RootMaMarText_marDirection, R_TO_L);// 默认从［右-左］滚动
         text = a.getString(R.styleable.RootMaMarText_marText);
+        text = TextUtils.isEmpty(text) ? " " : text;
         speed = a.getInt(R.styleable.RootMaMarText_marSpeedLevel, SO_SLOW);
         reverseLanguages = a.getString(R.styleable.RootMaMarText_marReverseLanguage);
         gravity = a.getInt(R.styleable.RootMaMarText_marGravity, GRAVIRY_CENTER);
