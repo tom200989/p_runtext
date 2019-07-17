@@ -237,6 +237,12 @@ public class RootMaMarText extends TextView {
         initOriText();
     }
 
+    /**
+     * 初始化原始文本样式
+     * 
+     * (只能从这里设置1次, 不能放在OnDraw里设置,
+     * 因为每个setxxxx的方法一定会调用invalidate, 这样的话就等于递归触发onDraw)
+     */
     private void initOriText() {
         if (!isInited) {/* 只初始化一次 */
             // 绘制原文本不变
