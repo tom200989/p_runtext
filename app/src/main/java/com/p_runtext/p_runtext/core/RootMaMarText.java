@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.LocaleList;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.TextView;
@@ -55,6 +56,7 @@ public class RootMaMarText extends TextView {
     private int stringWidth;// 字符宽度
     private int widgetWidth;// 控件宽度
     private boolean isStart;// 是否已经开启了timer
+    private boolean isInited;// 是否已经初始化过原始文本
     private String dyText;// 动态设置时临时存储的变量
 
     public RootMaMarText(Context context) {
@@ -163,6 +165,7 @@ public class RootMaMarText extends TextView {
             text = dyText;// 以动态设置的优先
         }
         init();// 开始初始化
+        Log.i("ma_martext", "onSizeChanged");
     }
 
     /**
@@ -230,14 +233,32 @@ public class RootMaMarText extends TextView {
         getAllWidth();
         // 计算初始化x的位置
         x = initX();
+        // 初始化原始文本样式
+        initOriText();
+    }
+
+    private void initOriText() {
+        if (!isInited) {/* 只初始化一次 */
+            // 绘制原文本不变
+            setLines(1);
+            setMaxLines(1);
+            setText(text);
+            setGravity(Gravity.CENTER);
+            setTextColor(backGroundColor);
+            setBackgroundColor(backGroundColor);
+            Log.i("ma_martext", "set ori text");
+            isInited = true;
+        }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        Log.i("ma_martext", "onDrawStart");
         // 第一次绘制时启动线程
         if (!isStart) {
             if (stringWidth > widgetWidth) {
                 start();
+                Log.i("ma_martext", "onDraw() -- start();");
             } else {
                 if (timerHelper != null) {
                     timerHelper.stop();
@@ -245,18 +266,16 @@ public class RootMaMarText extends TextView {
             }
         }
 
-        // 绘制原文本不变
-        setLines(1);
-        setMaxLines(1);
-        setText(text);
-        setGravity(Gravity.CENTER);
-        setTextColor(backGroundColor);
-        setBackgroundColor(backGroundColor);
         super.onDraw(canvas);
-        // 绘制自己的文本
-        baseline = getBaseline();
-        paint.setTextSize(calTextsize());
-        canvas.drawText(text, x, baseline, paint);
+        if (isInited) {
+            Log.i("ma_martext", "super.onDraw(canvas);");
+            // 绘制自己的文本
+            baseline = getBaseline();
+            paint.setTextSize(calTextsize());
+            canvas.drawText(text, x, baseline, paint);
+            Log.i("ma_martext", "onDrawfinsh");
+        }
+
     }
 
     /**
@@ -270,10 +289,10 @@ public class RootMaMarText extends TextView {
             public void doSomething() {
                 calNewX();// 计算新的X坐标
                 invalidate();// 刷新
+                Log.i("ma_martext", "invalidate()");
             }
         };
         timerHelper.start(speed);
-
     }
 
     /**

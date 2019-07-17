@@ -6,33 +6,66 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/bt_"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clickme"
-        android:text="click me to main 2" />
-
-    <com.p_runtext.p_runtext.core.RootMaMarText
-        android:id="@+id/tvmar"
+    <RelativeLayout
+        android:id="@+id/rl_title"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_centerInParent="true"
-        app:marGravity="Center"
-        app:marText="ABCD" />
+        android:background="@android:color/holo_red_dark">
 
-    <com.p_runtext.p_runtext.core.RootMaMarText
-        android:id="@+id/tvmar1"
-        android:layout_width="120dp"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        app:marBackground="@android:color/black"
-        app:marDirection="R_TO_L"
-        app:marGravity="Center"
-        app:marReverseLanguage="ar;en"
-        app:marSpeedLevel="standard"
-        app:marText="ABCDEFGHIJKLMNOPQRST"
-        app:marTextSizeRate="0.03"
-        app:marTextcolor="@android:color/white" />
+        <com.p_runtext.p_runtext.core.RootMaMarText
+            android:id="@+id/tvmar"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            app:marGravity="Center"
+            app:marText="ABCD"
+            app:marTextSizeRate="0.03" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/et_input"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/et_input"
+        android:layout_below="@id/rl_title"
+        android:background="@android:color/darker_gray"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="hello" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="hello" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="hello" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="hello" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="hello" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="hello" />
+
+    </LinearLayout>
 
 </RelativeLayout>
