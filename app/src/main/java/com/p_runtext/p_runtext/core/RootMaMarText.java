@@ -11,9 +11,9 @@ import android.os.Build;
 import android.os.LocaleList;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.TextView;
 
 import com.p_runtext.p_runtext.R;
@@ -30,11 +30,11 @@ public class RootMaMarText extends TextView {
 
     private final int R_TO_L = 0;// 从右到左
     private final int L_TO_R = 1;// 从左到右
-    private final int SO_SLOW = 20;// 非常慢
-    private final int SLOW = 16;// 慢
-    private final int NORMAL = 12;// 正常
-    private final int FAST = 8;// 快
-    private final int SO_FAST = 4;// 非常快
+    private final int SO_SLOW = 240;// 非常慢
+    private final int SLOW = 160;// 慢
+    private final int NORMAL = 120;// 正常
+    private final int FAST = 100;// 快
+    private final int SO_FAST = 80;// 非常快
     private final int GRAVIRY_START = 0;// 靠左(阿拉伯语靠右)
     private final int GRAVIRY_CENTER = 1;// 居中
     private final int GRAVIRY_END = 2;// 靠右(阿拉伯语靠左)
@@ -158,6 +158,12 @@ public class RootMaMarText extends TextView {
     }
 
     @Override
+    protected void onDetachedFromWindow() {// 在外部销毁该view前先停止定时器
+        stopTimer();// 停止定时器
+        super.onDetachedFromWindow();
+    }
+
+    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         // 此处是为了防止setMartext执行速度比onSizeChange的情况下 -- 需要以动态设置的优先
@@ -165,7 +171,6 @@ public class RootMaMarText extends TextView {
             text = dyText;// 以动态设置的优先
         }
         init();// 开始初始化
-        Log.i("ma_martext", "onSizeChanged");
     }
 
     /**
@@ -239,7 +244,7 @@ public class RootMaMarText extends TextView {
 
     /**
      * 初始化原始文本样式
-     * 
+     * <p>
      * (只能从这里设置1次, 不能放在OnDraw里设置,
      * 因为每个setxxxx的方法一定会调用invalidate, 这样的话就等于递归触发onDraw)
      */
@@ -252,34 +257,23 @@ public class RootMaMarText extends TextView {
             setGravity(Gravity.CENTER);
             setTextColor(backGroundColor);
             setBackgroundColor(backGroundColor);
-            Log.i("ma_martext", "set ori text");
             isInited = true;
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Log.i("ma_martext", "onDrawStart");
         // 第一次绘制时启动线程
         if (!isStart) {
-            if (stringWidth > widgetWidth) {
-                start();
-                Log.i("ma_martext", "onDraw() -- start();");
-            } else {
-                if (timerHelper != null) {
-                    timerHelper.stop();
-                }
-            }
+            start();
         }
 
         super.onDraw(canvas);
         if (isInited) {
-            Log.i("ma_martext", "super.onDraw(canvas);");
             // 绘制自己的文本
             baseline = getBaseline();
             paint.setTextSize(calTextsize());
             canvas.drawText(text, x, baseline, paint);
-            Log.i("ma_martext", "onDrawfinsh");
         }
 
     }
@@ -295,7 +289,7 @@ public class RootMaMarText extends TextView {
             public void doSomething() {
                 calNewX();// 计算新的X坐标
                 invalidate();// 刷新
-                Log.i("ma_martext", "invalidate()");
+                ((View) getParent()).invalidate();// 在自身view刷新后, 此处要让父布局也刷新, 否则父布局的属性会失效
             }
         };
         timerHelper.start(speed);
@@ -305,18 +299,20 @@ public class RootMaMarText extends TextView {
      * 计算新的X坐标
      */
     private void calNewX() {
-        if (direction == R_TO_L) {// 从右到左
-            if (x > -stringWidth) {
-                x--;
-            } else {
-                x = widgetWidth;
-            }
+        if (stringWidth > widgetWidth) {
+            if (direction == R_TO_L) {// 从右到左
+                if (x > -stringWidth) {
+                    x--;
+                } else {
+                    x = widgetWidth;
+                }
 
-        } else {// 从左到右
-            if (x < widgetWidth + stringWidth) {
-                x++;
-            } else {
-                x = 0;
+            } else {// 从左到右
+                if (x < widgetWidth + stringWidth) {
+                    x++;
+                } else {
+                    x = 0;
+                }
             }
         }
     }
@@ -342,12 +338,6 @@ public class RootMaMarText extends TextView {
         dyText = marText;// 假设本方法比onSizeChange执行速度快的情况 -- 此处需要在onSizeChange重新判断以本方法的text为准
         text = marText;// 假设本方法比onSizeChange执行速度慢的情况那么需要使用martext去覆盖本地的text
         init();// 重新初始化
-        /*
-         * 此处是为了防止: 当XML设置了超长字符, 但动态设置了超短字符(说明无需滚动)
-         * 此时定制器会自动启动, 但由于是动态设置优先, 此时应该停止定时器, 但定时器在启动一次后isStart = true
-         * 在此轮询时, onDraw()无法进入到［if］内部去stop定时器, 因此要手动切换为false以进入［if］条件体
-         * */
-        isStart = false;
         // 刷新
         invalidate();
     }

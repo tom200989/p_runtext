@@ -24,11 +24,11 @@
 
         <!-- 6.速度等级 -->
         <attr name="marSpeedLevel" format="integer">
-            <enum name="so_slow" value="20" />
-            <enum name="slow" value="16" />
-            <enum name="standard" value="12" />
-            <enum name="fast" value="8" />
-            <enum name="so_fast" value="4" />
+            <enum name="so_slow" value="240" />
+            <enum name="slow" value="160" />
+            <enum name="standard" value="120" />
+            <enum name="fast" value="100" />
+            <enum name="so_fast" value="80" />
         </attr>
 
         <!-- 7.需要适配的语言(如阿拉伯语需要从右到左) -->
