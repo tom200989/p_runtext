@@ -24,22 +24,28 @@
 
         <!-- 6.速度等级 -->
         <attr name="marSpeedLevel" format="integer">
-            <enum name="so_slow" value="240" />
-            <enum name="slow" value="160" />
-            <enum name="standard" value="120" />
-            <enum name="fast" value="100" />
-            <enum name="so_fast" value="80" />
+            <enum name="so_slow" value="100" />
+            <enum name="slow" value="80" />
+            <enum name="standard" value="60" />
+            <enum name="fast" value="40" />
+            <enum name="so_fast" value="25" />
         </attr>
 
         <!-- 7.需要适配的语言(如阿拉伯语需要从右到左) -->
         <attr name="marReverseLanguage" format="string" />
-        
+
         <!-- 8.对齐 -->
-        <attr name="marGravity" format="integer" >
-            <enum name="Start" value="0"/>
-            <enum name="Center" value="1"/>
-            <enum name="End" value="2"/>
+        <attr name="marGravity" format="integer">
+            <enum name="Start" value="0" />
+            <enum name="Center" value="1" />
+            <enum name="End" value="2" />
         </attr>
+
+        <!-- 9.测试间隔 -->
+        <attr name="test_duration" format="integer" />
+
+        <!-- 10.步长 -->
+        <attr name="marStep" format="integer" />
 
     </declare-styleable>
 

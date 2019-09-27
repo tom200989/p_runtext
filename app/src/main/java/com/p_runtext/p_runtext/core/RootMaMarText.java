@@ -30,11 +30,11 @@ public class RootMaMarText extends TextView {
 
     private final int R_TO_L = 0;// 从右到左
     private final int L_TO_R = 1;// 从左到右
-    private final int SO_SLOW = 240;// 非常慢
-    private final int SLOW = 160;// 慢
-    private final int NORMAL = 120;// 正常
-    private final int FAST = 100;// 快
-    private final int SO_FAST = 80;// 非常快
+    private final int SO_SLOW = 100;// 非常慢
+    private final int SLOW = 80;// 慢
+    private final int NORMAL = 60;// 正常
+    private final int FAST = 40;// 快
+    private final int SO_FAST = 25;// 非常快
     private final int GRAVIRY_START = 0;// 靠左(阿拉伯语靠右)
     private final int GRAVIRY_CENTER = 1;// 居中
     private final int GRAVIRY_END = 2;// 靠右(阿拉伯语靠左)
@@ -47,6 +47,8 @@ public class RootMaMarText extends TextView {
     private String text;// 文本
     private int gravity;// 对齐方式
     private String reverseLanguages;// 需要反转的语言
+    private int testDuration = -1;// 提供给开发的测试间距
+    private int step = 5;// 步长(默认5)
 
     private Paint paint;
     private int baseline;
@@ -58,6 +60,7 @@ public class RootMaMarText extends TextView {
     private boolean isStart;// 是否已经开启了timer
     private boolean isInited;// 是否已经初始化过原始文本
     private String dyText;// 动态设置时临时存储的变量
+
 
     public RootMaMarText(Context context) {
         this(context, null, 0);
@@ -93,6 +96,11 @@ public class RootMaMarText extends TextView {
         gravity = a.getInt(R.styleable.RootMaMarText_marGravity, GRAVIRY_CENTER);
         // 重新根据语言来决定是否反转
         direction = resetReverseLanguage() ? L_TO_R : R_TO_L;
+        // 测试间隔
+        testDuration = a.getInt(R.styleable.RootMaMarText_test_duration, -1);
+        // 步长
+        step = a.getInt(R.styleable.RootMaMarText_marStep, 5);
+        step = step > 10 ? 10 : step;
         a.recycle();
     }
 
@@ -292,7 +300,7 @@ public class RootMaMarText extends TextView {
                 ((View) getParent()).invalidate();// 在自身view刷新后, 此处要让父布局也刷新, 否则父布局的属性会失效
             }
         };
-        timerHelper.start(speed);
+        timerHelper.start(testDuration != -1 ? testDuration : speed);
     }
 
     /**
@@ -302,14 +310,14 @@ public class RootMaMarText extends TextView {
         if (stringWidth > widgetWidth) {
             if (direction == R_TO_L) {// 从右到左
                 if (x > -stringWidth) {
-                    x--;
+                    x -= step;
                 } else {
                     x = widgetWidth;
                 }
 
             } else {// 从左到右
                 if (x < widgetWidth + stringWidth) {
-                    x++;
+                    x += step;
                 } else {
                     x = 0;
                 }
