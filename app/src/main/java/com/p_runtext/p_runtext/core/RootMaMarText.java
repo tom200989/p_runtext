@@ -59,8 +59,9 @@ public class RootMaMarText extends TextView {
     private int widgetWidth;// 控件宽度
     private boolean isStart;// 是否已经开启了timer
     private boolean isInited;// 是否已经初始化过原始文本
+    private boolean isSpecialLanguage;// 是否为特殊语言
     private String dyText;// 动态设置时临时存储的变量
-
+    private String specialLanguages;// 特殊的语言适配(设置了特殊语言, 则使用原生的textview)
 
     public RootMaMarText(Context context) {
         this(context, null, 0);
@@ -85,6 +86,9 @@ public class RootMaMarText extends TextView {
     private void initAttrs(AttributeSet attrs, int defStyleAttr) {
         // 属性提取
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.RootMaMarText, defStyleAttr, 0);
+        // 优先判断是否为特殊语言
+        specialLanguages = a.getString(R.styleable.RootMaMarText_marSpecialLanguage);
+        isSpecialLanguage = resetTvBySpecialLanguage(specialLanguages);
         textColor = a.getColor(R.styleable.RootMaMarText_marTextcolor, Color.YELLOW);
         textSizeRate = a.getFloat(R.styleable.RootMaMarText_marTextSizeRate, textSizeRate);
         backGroundColor = a.getColor(R.styleable.RootMaMarText_marBackground, Color.BLACK);
@@ -102,6 +106,40 @@ public class RootMaMarText extends TextView {
         step = a.getInt(R.styleable.RootMaMarText_marStep, 5);
         step = step > 10 ? 10 : step;
         a.recycle();
+    }
+
+    /**
+     * 处理传递过来的特殊语言
+     *
+     * @param specialLanguages 特殊语言
+     * @return 集合
+     */
+    private boolean resetTvBySpecialLanguage(String specialLanguages) {
+        // 1.获取本地语言
+        Locale locale;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            locale = LocaleList.getDefault().get(0);
+        } else {
+            locale = Locale.getDefault();
+        }
+        // 2.获取到系统当前语言ru,pl...
+        String currentLanguage = locale.getLanguage();
+        // 3.遍历
+        if (!TextUtils.isEmpty(specialLanguages)) {
+            if (specialLanguages.contains(";")) {
+                // 如果包含了［;］则切割
+                String[] specis = specialLanguages.split(";");
+                for (String needLanguage : specis) {
+                    if (needLanguage.equalsIgnoreCase(currentLanguage)) {
+                        return true;
+                    }
+                }
+            }else {
+                // 否则直接判断
+                return specialLanguages.equalsIgnoreCase(currentLanguage);
+            }
+        } 
+        return false;
     }
 
     /**
@@ -167,12 +205,22 @@ public class RootMaMarText extends TextView {
 
     @Override
     protected void onDetachedFromWindow() {// 在外部销毁该view前先停止定时器
+        // TOAT: 适配特殊语言
+        if (isSpecialLanguage) {
+            super.onDetachedFromWindow();
+            return;
+        }
         stopTimer();// 停止定时器
         super.onDetachedFromWindow();
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        // TOAT: 适配特殊语言
+        if (isSpecialLanguage) {
+            super.onSizeChanged(w, h, oldw, oldh);
+            return;
+        }
         super.onSizeChanged(w, h, oldw, oldh);
         // 此处是为了防止setMartext执行速度比onSizeChange的情况下 -- 需要以动态设置的优先
         if (!TextUtils.isEmpty(dyText)) {
@@ -271,6 +319,11 @@ public class RootMaMarText extends TextView {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        // TOAT: 适配特殊语言
+        if (isSpecialLanguage) {
+            super.onDraw(canvas);
+            return;
+        }
         // 第一次绘制时启动线程
         if (!isStart) {
             start();
@@ -343,6 +396,11 @@ public class RootMaMarText extends TextView {
      * @param marText 需要重新设置的文本
      */
     public void setMartext(String marText) {
+        // TOAT: 适配特殊语言
+        if (isSpecialLanguage) {
+            setText(marText);
+            return;
+        }
         dyText = marText;// 假设本方法比onSizeChange执行速度快的情况 -- 此处需要在onSizeChange重新判断以本方法的text为准
         text = marText;// 假设本方法比onSizeChange执行速度慢的情况那么需要使用martext去覆盖本地的text
         init();// 重新初始化

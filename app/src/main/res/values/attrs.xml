@@ -46,6 +46,9 @@
 
         <!-- 10.步长 -->
         <attr name="marStep" format="integer" />
+        
+        <!-- 11.适配特殊语言 -->
+        <attr name="marSpecialLanguage" format="string" />
 
     </declare-styleable>
 
