@@ -1,15 +1,18 @@
-//apply plugin: 'com.android.application'
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
+// apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+    
     defaultConfig {
-//        applicationId "com.p_runtext.p_runtext"
-        minSdkVersion 19
-        targetSdkVersion 28
+        applicationId "com.p_runtext.p_runtext"
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
     }
+    
     buildTypes {
         release {
             minifyEnabled false
@@ -20,6 +23,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    
+    // 注意这里先不要升级到VERSION_11 否则不通过
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -32,7 +37,6 @@ repositories {
         dirs 'libs'
     }
 }
-
 
 
 dependencies {

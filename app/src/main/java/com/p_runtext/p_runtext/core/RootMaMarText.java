@@ -75,6 +75,7 @@ public class RootMaMarText extends TextView {
         super(context, attrs, defStyleAttr);
         this.context = context;
         initAttrs(attrs, defStyleAttr);
+        setSpecialLangUi();
     }
 
     /**
@@ -106,6 +107,16 @@ public class RootMaMarText extends TextView {
         step = a.getInt(R.styleable.RootMaMarText_marStep, 5);
         step = step > 10 ? 10 : step;
         a.recycle();
+    }
+
+    /**
+     * 针对特殊语言做UI处理
+     */
+    private void setSpecialLangUi() {
+        if (isSpecialLanguage) {
+            setText(text);
+            setTextColor(textColor);
+        }
     }
 
     /**
