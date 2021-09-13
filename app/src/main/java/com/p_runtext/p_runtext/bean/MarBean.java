@@ -6,7 +6,7 @@ import android.graphics.Color;
  * Created by qianli.ma on 2019/7/10 0010.
  */
 public class MarBean {
-    
+
     private float textSizeRate = 0.03f; // 字体大小比例(相对屏幕)
     private int textColor = Color.RED; // 字体的颜色
     private int backGroundColor = Color.WHITE;// 背景色
