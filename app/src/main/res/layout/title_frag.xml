@@ -22,6 +22,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 app:marGravity="Center"
+                app:marStep="2"
+                app:marSpeedLevel="so_fast"
                 app:marText="ABCD_FRAGMENT"
                 app:marTextSizeRate="0.03" />
         </RelativeLayout>
